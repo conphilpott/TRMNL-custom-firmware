@@ -5,3 +5,4 @@
 .vscode/ipch
 .idea
 .vscode/settings.json
+./include/secrets.h

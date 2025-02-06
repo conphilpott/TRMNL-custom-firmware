@@ -25,6 +25,7 @@
 #include <special_function.h>
 #include <api_response_parsing.h>
 #include "logging_parcers.h"
+#include "secrets.h"
 
 bool pref_clear = false;
 
@@ -497,7 +498,7 @@ static https_request_err_e downloadAndShow(const char *url)
     strcpy(new_url, url);
     strcat(new_url, "/api/display/");
 
-    String api_key = "";
+    String api_key = API_KEY_SECRET;
     if (preferences.isKey(PREFERENCES_API_KEY))
     {
       api_key = preferences.getString(PREFERENCES_API_KEY, PREFERENCES_API_KEY_DEFAULT);
@@ -1310,6 +1311,16 @@ static void getDeviceCredentials(const char *url)
             }
             else
             {
+              String api_key = API_KEY_SECRET;
+              Log.info("%s [%d]: API key - %s\r\n", __FILE__, __LINE__, api_key.c_str());
+              size_t res = preferences.putString(PREFERENCES_API_KEY, api_key);
+              Log.info("%s [%d]: api key saved in the preferences - %d\r\n", __FILE__, __LINE__, res);
+
+              String friendly_id = FRIENDLY_ID_SECRET;
+              Log.info("%s [%d]: friendly ID - %s\r\n", __FILE__, __LINE__, friendly_id.c_str());
+              res = preferences.putString(PREFERENCES_FRIENDLY_ID, friendly_id);
+              Log.info("%s [%d]: friendly ID saved in the preferences - %d\r\n", __FILE__, __LINE__, res);
+              
               Log.info("%s [%d]: status FAIL.\r\n", __FILE__, __LINE__);
               status = false;
             }
@@ -1621,7 +1632,8 @@ static float readBatteryVoltage(void)
 
   int32_t sensorValue = (adc / 128) * 2;
 
-  float voltage = sensorValue / 1000.0;
+  float voltage = (sensorValue / 1000.0) * (3.3/5);
+  //voltage = 4.2;
   return voltage;
 }
 
